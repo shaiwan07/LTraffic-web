@@ -1,0 +1,6 @@
+import { FiArrowUpRight } from "react-icons/fi";
+import Link from "next/link";
+
+export default function TeamPage() {
+    return <main><section className="page-hero"><div className="container-fluid px-4 px-xxl-5"><span className="eyebrow">Our people</span><h1>Good work starts with good people.</h1><p>Our teams bring experience, curiosity and pride to every site, every shift and every conversation.</p></div></section><section className="section-space"><div className="container-fluid px-4 px-xxl-5"><div className="row g-4 team-grid"><div className="col-md-6 col-lg-4"><div className="team-card"><span>01</span><h2>Site teams</h2><p>Skilled people who know how to turn a plan into safe, considered work on the ground.</p></div></div><div className="col-md-6 col-lg-4"><div className="team-card team-card--accent"><span>02</span><h2>Project leaders</h2><p>Experienced thinkers who keep communication clear and delivery moving from start to finish.</p></div></div><div className="col-md-6 col-lg-4"><div className="team-card team-card--dark"><span>03</span><h2>Support team</h2><p>A responsive network behind the scenes, ready to solve problems and support our clients.</p></div></div></div><div className="team-cta"><h2>Want to be part of what comes next?</h2><Link className="text-link" href="/contact">Get in touch <FiArrowUpRight /></Link></div></div></section></main>;
+}
