@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Collapse, Nav, Navbar, NavbarToggler, NavItem } from "reactstrap";
-import { FiArrowUpRight, FiPhone } from "react-icons/fi";
+import { FiArrowUpRight, FiChevronDown, FiPhone } from "react-icons/fi";
 import logo from "@/assets/images/logo.png";
 
 export function SiteHeader() {
@@ -19,6 +19,43 @@ export function SiteHeader() {
 
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const menuItems = [
+        { label: "Home", href: "/" },
+        {
+            label: "Company",
+            href: "/about",
+            dropdown: [
+                { label: "About Us", href: "/about" },
+                { label: "Our People", href: "/team" },
+            ],
+        },
+        {
+            label: "Projects",
+            href: "/services",
+            dropdown: [
+                { label: "Current Projects", href: "/services" },
+                { label: "Completed Projects", href: "/services" },
+            ],
+        },
+        {
+            label: "Services",
+            href: "/services",
+            dropdown: [
+                { label: "Services we provide", href: "/services" },
+                { label: "Request a quote", href: "/contact" },
+            ],
+        },
+        {
+            label: "News",
+            href: "/news",
+            dropdown: [
+                { label: "Latest News", href: "/news" },
+                { label: "Social Media", href: "/news" },
+            ],
+        },
+        { label: "Contact", href: "/contact" },
+    ];
 
     return (
         <header className={`site-header${isScrolled ? " is-scrolled" : ""}`}>
@@ -41,16 +78,32 @@ export function SiteHeader() {
 
                     <Collapse isOpen={isOpen} navbar className="site-collapse">
                         <Nav navbar className="site-nav-links">
-                            <NavItem><Link className="nav-link" href="/">Home</Link></NavItem>
-                            <NavItem><Link className="nav-link" href="/about">About</Link></NavItem>
-                            <NavItem><Link className="nav-link" href="/services">Services</Link></NavItem>
-                            <NavItem><Link className="nav-link" href="/team">Our people</Link></NavItem>
-                            <NavItem><Link className="nav-link" href="/news">News</Link></NavItem>
+                            {menuItems.map((item) => (
+                                item.dropdown ? (
+                                    <NavItem key={item.label} className="has-dropdown">
+                                        <Link className="nav-link" href={item.href || "#"}>
+                                            <span>{item.label}</span>
+                                            <FiChevronDown />
+                                        </Link>
+                                        <div className="dropdown-menu" aria-label={`${item.label} submenu`}>
+                                            {item.dropdown.map((child) => (
+                                                <Link key={child.label} href={child.href} className="dropdown-link">
+                                                    {child.label}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </NavItem>
+                                ) : (
+                                    <NavItem key={item.label}>
+                                        <Link className="nav-link" href={item.href}>{item.label}</Link>
+                                    </NavItem>
+                                )
+                            ))}
                         </Nav>
 
                         <div className="site-nav-actions">
-                            <Link className="nav-login" href="/contact">Login</Link>
-                            <Link className="nav-cta" href="/contact"><FiArrowUpRight /> Start a conversation</Link>
+                            <Link href="/login" className="nav-login">Login</Link>
+                            <Link href="/contact" className="nav-cta">Start a conversation <FiArrowUpRight /></Link>
                         </div>
                     </Collapse>
                 </div>
