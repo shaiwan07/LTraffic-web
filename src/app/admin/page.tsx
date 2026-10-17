@@ -11,7 +11,7 @@ export default function AdminPage() {
                     <h1>Admin Area</h1>
                     <p>Your operational tools and project workspaces, all in one place.</p>
                 </div>
-                <span className="admin-overview-badge"><FiGrid aria-hidden="true" /> 8 workspaces</span>
+                <span className="admin-overview-badge"><FiGrid aria-hidden="true" /> {adminModules.length} workspaces</span>
             </div>
 
             <div className="admin-module-grid">
