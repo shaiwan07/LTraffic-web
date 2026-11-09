@@ -1,18 +1,16 @@
 import Link from "next/link";
 import { FiArrowUpRight, FiGrid } from "react-icons/fi";
+import AdminPageHeading from "@/components/admin/AdminPageHeading";
 import { adminModules } from "./admin-menu";
 
 export default function AdminPage() {
     return (
         <section className="admin-overview">
-            <div className="admin-page-heading">
-                <div>
-                    <span className="admin-eyebrow">Admin workspace</span>
-                    <h1>Admin Area</h1>
-                    <p>Your operational tools and project workspaces, all in one place.</p>
-                </div>
-                <span className="admin-overview-badge"><FiGrid aria-hidden="true" /> {adminModules.length} workspaces</span>
-            </div>
+            <AdminPageHeading
+                title="Admin Area"
+                description="Your operational tools and project workspaces, all in one place."
+                actions={<span className="admin-overview-badge"><FiGrid aria-hidden="true" /> {adminModules.length} workspaces</span>}
+            />
 
             <div className="admin-module-grid">
                 {adminModules.map(({ label, href, description, icon: Icon }, index) => (

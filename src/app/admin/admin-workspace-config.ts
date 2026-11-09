@@ -9,6 +9,8 @@ export type AdminField = {
 export type AdminColumn = {
     label: string;
     field: string;
+    type?: "image" | "link";
+    hrefField?: string;
 };
 
 export type AdminRecord = Record<string, string> & { id: string };
@@ -18,10 +20,16 @@ export type AdminWorkspaceConfig = {
     title: string;
     description: string;
     columns: AdminColumn[];
+    employeeColumns?: AdminColumn[];
+    employeeHideActions?: boolean;
+    actionsLabel?: string;
     fields: AdminField[];
     initialRecords: AdminRecord[];
     statusField?: string;
     pdfLabel?: string;
+    pdfColumn?: boolean;
+    pdfColumnLabel?: string;
+    pdfUrl?: string;
     createHref?: string;
     relatedHref?: string;
 };
@@ -32,15 +40,19 @@ export const incidentRecords: AdminWorkspaceConfig = {
     description: "Review, investigate and close incident reports.",
     statusField: "status",
     pdfLabel: "Incident report",
+    pdfColumn: true,
+    pdfColumnLabel: "Incident PDF",
+    pdfUrl: "https://ltraffic.co.uk/employeesarea/pdf/h&sformpdf.php?id={id}",
+    actionsLabel: "Links",
     createHref: "/admin/report-an-incident/new",
     columns: [
         { label: "ID", field: "id" },
         { label: "Status", field: "status" },
-        { label: "Operative", field: "operative" },
-        { label: "Date / time", field: "date" },
-        { label: "Incident type", field: "type" },
+        { label: "Operatives Name", field: "operative" },
+        { label: "Date/Time of Incident", field: "date" },
+        { label: "Type of Incident", field: "type" },
         { label: "Location", field: "location" },
-        { label: "Reported by", field: "reportedBy" },
+        { label: "Reported By", field: "reportedBy" },
     ],
     fields: [
         { name: "status", label: "Status", type: "select", options: ["Open", "Under investigation", "Closed"], required: true },
@@ -78,15 +90,31 @@ export const vehicleChecks: AdminWorkspaceConfig = {
     description: "Review driver checks, vehicle condition and safety actions.",
     statusField: "safety",
     pdfLabel: "Vehicle check report",
+    pdfColumn: true,
+    pdfColumnLabel: "Vehicle Report",
+    pdfUrl: "https://ltraffic.co.uk/employeesarea/pdf/vcpdf.php?id={id}",
+    actionsLabel: "Links",
     columns: [
         { label: "ID", field: "id" },
-        { label: "Driver", field: "driver" },
-        { label: "Registration", field: "registration" },
-        { label: "Mileage", field: "mileage" },
-        { label: "Inspection date", field: "date" },
+        { label: "Drivers Name", field: "driver" },
+        { label: "Vehicle Registration", field: "registration" },
+        { label: "Vehicle Mileage", field: "mileage" },
+        { label: "Inspection Date", field: "date" },
         { label: "Vehicle condition", field: "condition" },
         { label: "Safety condition", field: "safety" },
     ],
+    employeeColumns: [
+        { label: "ID", field: "id" },
+        { label: "Drivers Name", field: "driver" },
+        { label: "Vehicle Registration", field: "registration" },
+        { label: "Vehicle Mileage", field: "mileage" },
+        { label: "Inspection Date", field: "date" },
+        { label: "Vehicle Condition?", field: "condition" },
+        { label: "Vehicle Safe to Drive?", field: "safety" },
+        { label: "Defects/Damages (Details)?", field: "description" },
+        { label: "Vehicle Check Report", field: "vehicleCheckReport", type: "link", hrefField: "vehicleCheckReportUrl" },
+    ],
+    employeeHideActions: true,
     fields: [
         { name: "driver", label: "Driver name", required: true },
         { name: "registration", label: "Vehicle registration", required: true },
@@ -108,19 +136,51 @@ export const timesheets: AdminWorkspaceConfig = {
     description: "Check submitted weekly hours and review employee timesheets.",
     statusField: "status",
     pdfLabel: "Timesheet",
+    pdfColumn: true,
+    pdfColumnLabel: "Timesheet PDF",
+    pdfUrl: "https://ltraffic.co.uk/employeesarea/pdf/timesheetspdf.php?id={id}",
+    actionsLabel: "Links",
     columns: [
         { label: "ID", field: "id" },
-        { label: "Operative", field: "employee" },
-        { label: "Employee ID", field: "employeeId" },
-        { label: "Week commencing", field: "week" },
-        { label: "Mon", field: "mon" },
-        { label: "Tue", field: "tue" },
-        { label: "Wed", field: "wed" },
-        { label: "Thu", field: "thu" },
-        { label: "Fri", field: "fri" },
-        { label: "Sat", field: "sat" },
-        { label: "Sun", field: "sun" },
         { label: "Status", field: "status" },
+        { label: "Operatives Name", field: "employee" },
+        { label: "Employee ID", field: "employeeId" },
+        { label: "Week Commencing", field: "week" },
+        { label: "Day / Date", field: "monDate" },
+        { label: "Hours", field: "mon" },
+        { label: "Day / Date", field: "tueDate" },
+        { label: "Hours", field: "tue" },
+        { label: "Day / Date", field: "wedDate" },
+        { label: "Hours", field: "wed" },
+        { label: "Day / Date", field: "thuDate" },
+        { label: "Hours", field: "thu" },
+        { label: "Day / Date", field: "friDate" },
+        { label: "Hours", field: "fri" },
+        { label: "Day / Date", field: "satDate" },
+        { label: "Hours", field: "sat" },
+        { label: "Day / Date", field: "sunDate" },
+        { label: "Hours", field: "sun" },
+    ],
+    employeeColumns: [
+        { label: "ID", field: "id" },
+        { label: "Status", field: "status" },
+        { label: "Operatives Name", field: "employee" },
+        { label: "Employee ID", field: "employeeId" },
+        { label: "Week Commencing", field: "week" },
+        { label: "Day / Date", field: "monDate" },
+        { label: "Hours", field: "mon" },
+        { label: "Day / Date", field: "tueDate" },
+        { label: "Hours", field: "tue" },
+        { label: "Day / Date", field: "wedDate" },
+        { label: "Hours", field: "wed" },
+        { label: "Day / Date", field: "thuDate" },
+        { label: "Hours", field: "thu" },
+        { label: "Day / Date", field: "friDate" },
+        { label: "Hours", field: "fri" },
+        { label: "Day / Date", field: "satDate" },
+        { label: "Hours", field: "sat" },
+        { label: "Day / Date", field: "sunDate" },
+        { label: "Hours", field: "sun" },
     ],
     fields: [
         { name: "employee", label: "Operatives name", required: true },
@@ -148,13 +208,15 @@ export const bulletins: AdminWorkspaceConfig = {
     statusField: "active",
     pdfLabel: "Bulletin",
     columns: [
-        { label: "Reference", field: "reference" },
-        { label: "Title", field: "title" },
-        { label: "Description", field: "description" },
-        { label: "Date added", field: "date" },
-        { label: "Document", field: "document" },
-        { label: "Active", field: "active" },
-        { label: "Read confirmations", field: "readCount" },
+        { label: "ID", field: "id" },
+        { label: "Bulletin Image", field: "bulletinImage", type: "image" },
+        { label: "Bulletin Title", field: "title" },
+        { label: "Bulletin Reference", field: "reference" },
+        { label: "Bulletin Description", field: "description" },
+        { label: "Date / Time Added", field: "date" },
+        { label: "Document Link", field: "documentLinkText", type: "link", hrefField: "documentUrl" },
+        { label: "Active (1=Yes 0=No)", field: "active" },
+        { label: "Read Confirm", field: "readCount" },
     ],
     fields: [
         { name: "title", label: "Bulletin title", required: true },
@@ -177,15 +239,20 @@ export const employees: AdminWorkspaceConfig = {
     description: "Manage employee profiles, work details and onboarding records.",
     pdfLabel: "Employee onboarding record",
     columns: [
+        { label: "Employee Photo", field: "employeePhoto", type: "image" },
         { label: "Employee ID", field: "employeeId" },
-        { label: "Employee", field: "name" },
-        { label: "Contact", field: "phone" },
-        { label: "Email", field: "email" },
-        { label: "Job title", field: "jobTitle" },
-        { label: "Line manager", field: "manager" },
-        { label: "Work location", field: "location" },
-        { label: "Review date", field: "reviewDate" },
+        { label: "Employees Name", field: "name" },
+        { label: "Contact Number", field: "phone" },
+        { label: "Email Address", field: "email" },
+        { label: "Job Title", field: "jobTitle" },
+        { label: "Line Manager", field: "manager" },
+        { label: "Work Location", field: "location" },
+        { label: "Review / Date Signed", field: "reviewDate" },
     ],
+    actionsLabel: "Links",
+    pdfColumn: true,
+    pdfColumnLabel: "Onboarding PDF",
+    pdfUrl: "https://ltraffic.co.uk/employeesarea/pdf/onboardingpdf.php?id={id}",
     fields: [
         { name: "employeeId", label: "Employee ID", required: true },
         { name: "name", label: "Employee name", required: true },
@@ -283,20 +350,23 @@ export const siteInspections: AdminWorkspaceConfig = {
     description: "Review live and completed site inspection results.",
     statusField: "status",
     pdfLabel: "Site inspection report",
+    pdfColumn: true,
+    pdfColumnLabel: "PDF Report",
+    actionsLabel: "Links",
     columns: [
-        { label: "ID", field: "id" },
-        { label: "Status", field: "status" },
-        { label: "Site reference", field: "reference" },
-        { label: "Location", field: "location" },
-        { label: "Site lead", field: "siteLead" },
-        { label: "Vehicle", field: "vehicleResult" },
-        { label: "Documentation", field: "documentation" },
-        { label: "Workplace / facilities", field: "workplace" },
-        { label: "Working at height", field: "workingAtHeight" },
-        { label: "PPE", field: "ppe" },
-        { label: "Environment", field: "environment" },
-        { label: "Overall result", field: "inspectionResult" },
-        { label: "Completed by", field: "completedBy" },
+        { label: "Inspection ID", field: "id" },
+        { label: "Inspection Status", field: "status" },
+        { label: "Site Reference", field: "reference" },
+        { label: "Site Location", field: "location" },
+        { label: "Site Ganger / PIC", field: "siteLead" },
+        { label: "P2 - Vehicle Inspection Result", field: "vehicleResult" },
+        { label: "P3 - Documentation Inspection Result", field: "documentation" },
+        { label: "P4 - Workplace & Site Facilities Inspection Result", field: "workplace" },
+        { label: "P5 - WAH Inspection Result", field: "workingAtHeight" },
+        { label: "P6 - PPE Inspection Result", field: "ppe" },
+        { label: "P7 - Environmental Protection Inspection Result", field: "environment" },
+        { label: "P8 - Inspection Result", field: "inspectionResult" },
+        { label: "Inspection Completed By", field: "completedBy" },
     ],
     fields: [
         { name: "status", label: "Inspection status", type: "select", options: ["Live", "Completed", "Action required"], required: true },
@@ -325,15 +395,19 @@ export const vehicleInspections: AdminWorkspaceConfig = {
     description: "Review inspection mileage, roadworthiness and required works.",
     statusField: "status",
     pdfLabel: "Vehicle inspection report",
+    pdfColumn: true,
+    pdfColumnLabel: "PDF Report",
+    pdfUrl: "https://ltraffic.co.uk/employeesarea/pdf/vicpdf.php?id={id}",
+    actionsLabel: "Links",
     columns: [
-        { label: "ID", field: "id" },
-        { label: "Completed by", field: "completedBy" },
-        { label: "Date", field: "date" },
-        { label: "Registration", field: "registration" },
-        { label: "Mileage", field: "mileage" },
-        { label: "Safe to drive", field: "safe" },
-        { label: "Advisory works", field: "advisory" },
-        { label: "Defect works", field: "defects" },
+        { label: "Inspection ID", field: "id" },
+        { label: "Inspection Completed By", field: "completedBy" },
+        { label: "Inspection Time/Date", field: "date" },
+        { label: "Vehicle Registration", field: "registration" },
+        { label: "Vehicle Mileage", field: "mileage" },
+        { label: "Vehicle Safe to Drive", field: "safe" },
+        { label: "Advisory Works Required", field: "advisory" },
+        { label: "Defect Works Required", field: "defects" },
         { label: "Status", field: "status" },
     ],
     fields: [
@@ -390,12 +464,9 @@ export const documents: AdminWorkspaceConfig = {
     statusField: "status",
     pdfLabel: "Document",
     columns: [
-        { label: "Reference", field: "reference" },
-        { label: "Document", field: "title" },
-        { label: "Category", field: "category" },
-        { label: "Version", field: "version" },
-        { label: "Review date", field: "reviewDate" },
-        { label: "Status", field: "status" },
+        { label: "Document Reference", field: "reference" },
+        { label: "Document Link", field: "documentTitle", type: "link", hrefField: "documentUrl" },
+        { label: "Document Issue", field: "documentIssue" },
     ],
     fields: [
         { name: "reference", label: "Document reference", required: true },
@@ -416,11 +487,17 @@ export const documents: AdminWorkspaceConfig = {
 
 export function getDocumentCategoryConfig(category: string): AdminWorkspaceConfig {
     const slug = category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const linkLabel = category === "Policies" ? "Policy Link" : category === "Method statements" ? "Method Statement Link" : category === "Processes" ? "Process Link" : "CoSHH Link";
     return {
         ...documents,
         key: `document-library-${slug}`,
         title: `${category} Documents`,
         description: `Search and maintain controlled ${category.toLowerCase()} documents and their issue status.`,
+        columns: [
+            { label: "Document Reference", field: "reference" },
+            { label: linkLabel, field: "documentTitle", type: "link", hrefField: "documentUrl" },
+            { label: "Document Issue", field: "documentIssue" },
+        ],
         initialRecords: documents.initialRecords.filter((record) => record.category === category),
         fields: documents.fields.map((field) => field.name === "category" ? { ...field, options: [category] } : field),
     };

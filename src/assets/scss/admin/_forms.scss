@@ -1,0 +1,354 @@
+@use "../base/variables" as *;
+
+.admin-content {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px !important;
+}
+
+.admin-page-heading {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 19px;
+
+    h1 {
+        margin: 0;
+        color: #142d47;
+        font-size: 25px;
+        letter-spacing: -.045em;
+        line-height: 1.15;
+    }
+}
+
+.admin-workspace-add {
+    min-height: 40px;
+    border-radius: 6px !important;
+}
+
+.incident-page {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.incident-form-shell {
+    overflow: hidden;
+    border: 1px solid #dfe6ed;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(15, 43, 70, .05);
+}
+
+.incident-form-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 24px;
+    border-bottom: 1px solid #e5ebf1;
+    background: linear-gradient(100deg, #f7fafc, #fff 75%);
+}
+
+.incident-form-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 8px;
+    background: #eaf4ed;
+    color: #17663f;
+    font-size: 20px;
+}
+
+.incident-form-intro h2 {
+    margin: 0 0 4px;
+    color: #173d5c;
+    font-size: 16px;
+    line-height: 1.35;
+}
+
+.incident-form-intro p {
+    max-width: 850px;
+    margin: 0;
+    color: #64778a;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.incident-form {
+    padding: 0 24px 24px;
+}
+
+.incident-form-section {
+    padding: 0 0 22px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.incident-form-section:last-of-type {
+    border-bottom: 0;
+}
+
+.incident-section-heading {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    margin: 0 -24px 16px;
+    padding: 10px 24px;
+    border-bottom: 1px solid #e8edf2;
+    background: linear-gradient(90deg, #edf3f8 0%, #f7fafc 100%);
+}
+
+.incident-section-heading>span {
+    display: none;
+}
+
+.incident-section-heading h3 {
+    margin: 0;
+    color: #203951;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.incident-form .form-label,
+.incident-radio-field legend.form-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #40566c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.incident-required,
+.admin-field-required {
+    margin-left: 4px;
+    color: #dc3545;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: none;
+}
+
+.incident-form .form-control {
+    min-height: 42px;
+    border: 1px solid #dce4eb;
+    border-radius: 7px;
+    background: #fff;
+    color: #203951;
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.incident-form textarea.form-control {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.incident-form .form-control:focus {
+    border-color: #5d839f;
+    box-shadow: 0 0 0 3px rgba(53, 101, 139, .09);
+}
+
+.incident-form .form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, .08);
+}
+
+.incident-radio-field {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.incident-radio-field legend {
+    float: none;
+    width: 100%;
+}
+
+.incident-radio-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.incident-radio-options .form-check {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 7px 10px;
+    border: 1px solid #dfe6ed;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.incident-radio-options .form-check:has(.form-check-input:checked) {
+    border-color: #17663f;
+    background: #f1f7f4;
+}
+
+.incident-radio-options .form-check-input {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+}
+
+.incident-radio-options .form-check-input:checked {
+    border-color: #17663f;
+    background-color: #17663f;
+}
+
+.incident-radio-options .form-check-label {
+    margin: 0;
+    color: #40566c;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.incident-upload-zone {
+    display: flex;
+    min-height: 128px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px dashed #b7c8d6;
+    border-radius: 8px;
+    background: #f8fafb;
+    color: #526a7f;
+    cursor: pointer;
+    text-align: center;
+}
+
+.incident-upload-zone:hover,
+.incident-upload-zone.is-dragging {
+    border-color: #17663f;
+    background: #f2f8f4;
+}
+
+.incident-upload-zone>svg {
+    color: #427398;
+    font-size: 22px;
+}
+
+.incident-upload-zone span {
+    font-size: 12px;
+}
+
+.incident-upload-zone strong {
+    color: #17663f;
+}
+
+.incident-upload-zone small {
+    color: #8592a0;
+    font-size: 10px;
+}
+
+.incident-submit-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid #e8edf2;
+}
+
+.incident-confirm-check {
+    flex: 1;
+    margin: 0;
+}
+
+.incident-confirm-check .form-check-label {
+    color: #40566c;
+    font-size: 12px;
+}
+
+.admin-record-form {
+    padding: 0 24px 24px;
+}
+
+.admin-record-form-section {
+    padding: 0 0 22px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.admin-record-form-section:last-of-type {
+    border-bottom: 0;
+}
+
+.admin-form-section-heading {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    margin: 0 -24px 16px;
+    padding: 10px 24px;
+    border-bottom: 1px solid #e8edf2;
+    background: linear-gradient(90deg, #edf3f8 0%, #f7fafc 100%);
+}
+
+.admin-form-section-heading h3 {
+    margin: 0;
+    color: #203951;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-record-form .form-control,
+.admin-record-form .form-select {
+    min-height: 42px;
+    border-color: #dce4eb;
+    border-radius: 7px;
+    color: #203951;
+    font-size: 13px;
+}
+
+.admin-record-form .form-control.is-invalid,
+.admin-record-form .form-select.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, .08);
+}
+
+.invalid-feedback {
+    font-size: 12px;
+}
+
+@media (max-width: 767px) {
+    .admin-content {
+        padding: 16px !important;
+    }
+
+    .admin-page-heading {
+        align-items: flex-start;
+    }
+
+    .incident-form {
+        padding-inline: 16px;
+    }
+
+    .incident-form-intro {
+        padding-inline: 16px;
+    }
+
+    .incident-section-heading,
+    .admin-form-section-heading {
+        margin-inline: -16px;
+    }
+
+    .incident-radio-options .form-check {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+    .incident-submit-area {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 575px) {
+    .incident-radio-options .form-check {
+        flex-basis: 100%;
+    }
+}

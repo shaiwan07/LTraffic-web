@@ -1,0 +1,1 @@
+export { default } from "../../../../equipment-allocation/vehicle-register/maintenance/page";

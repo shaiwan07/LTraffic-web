@@ -11,13 +11,13 @@ import {
 
 export const adminNavigation = [
     {
-        label: "Reported Incidents",
+        label: "Report an Incident",
         href: "/admin/report-an-incident",
         description: "Review, investigate and close incident reports.",
         icon: FiAlertCircle,
     },
     {
-        label: "Vehicle Checks",
+        label: "Vehicle Check",
         href: "/admin/vehicle-checks",
         description: "Review driver checks and vehicle safety actions.",
         icon: FiTruck,
@@ -67,7 +67,7 @@ export const adminNavigation = [
     {
         label: "User Admin",
         href: "/admin/user-admin",
-        description: "Manage portal accounts, access levels and onboarding.",
+        description: "Manage user accounts and access levels.",
         icon: FiUsers,
     },
 ];

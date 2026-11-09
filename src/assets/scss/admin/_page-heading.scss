@@ -1,0 +1,21 @@
+@use "../base/variables" as *;
+
+.admin-page-heading-actions {
+    flex: 0 0 auto;
+}
+
+.admin-page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 19px;
+
+    h1 {
+        color: #142d47;
+        letter-spacing: -0.045em;
+        margin: 0;
+        font-size: 25px;
+        line-height: 1.15;
+    }
+}

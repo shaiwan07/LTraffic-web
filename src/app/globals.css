@@ -277,6 +277,9 @@ blockquote { font-size: clamp(2rem, 4vw, 4.1rem); letter-spacing: -.05em; line-h
 .admin-workspace-count { margin-left: auto; color: #728295; font-size: .76rem; white-space: nowrap; }
 .admin-workspace-notice { margin: 0 0 1rem; padding: .7rem .9rem; border-left: 3px solid #17663f; background: #eef7f0; color: #315b3e; font-size: .78rem; }
 .admin-workspace-table-wrap { overflow-x: auto; border: 1px solid #e3eaf0; border-radius: .7rem; background: #fff; }
+.admin-pdf-report-link { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem 0; border: 0; background: transparent; color: #17663f; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; cursor: pointer; }
+.admin-pdf-report-link:hover { color: #102b46; }
+.admin-pdf-report-link:focus-visible { outline: 2px solid #17663f; outline-offset: 2px; }
 .admin-workspace-table { min-width: 850px; margin: 0; color: #40566c; font-size: .76rem; vertical-align: middle; }
 .admin-workspace-table > :not(caption) > * > * { padding: .78rem .85rem; border-bottom-color: #edf1f4; }
 .admin-workspace-table thead th { background: #f6f8fa; color: #5a6e81; font-size: .66rem; font-weight: 600; letter-spacing: .04em; white-space: nowrap; }

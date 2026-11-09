@@ -1,60 +1,109 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import "@/assets/scss/index.scss";
+
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-    FiBriefcase,
-    FiChevronRight,
-    FiGrid,
-    FiLogOut,
-    FiMenu,
-    FiX,
-} from "react-icons/fi";
-import { adminNavigation } from "./admin-menu";
+import { FiBriefcase, FiChevronRight, FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { superAdminNavigation } from "./super-admin/admin-menu";
+import { employeesNavigation } from "./employees/admin-menu";
+import { AdminRoleContext, normalizeAdminRole, type AdminRole } from "./admin-role";
+
+function isNavigationItemActive(pathname: string, href: string) {
+    return href === "/admin/employees" ? pathname === href : pathname.startsWith(href);
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
-    const isEmployeesArea = pathname.startsWith("/admin/employeesarea");
-    const activePage = adminNavigation.find((item) => pathname.startsWith(item.href));
+    const [role, setRole] = useState<AdminRole>("super-admin");
+    const isEmployeesArea = pathname.startsWith("/admin/employees") || role === "employees";
+    const navigation = role === "employees" ? employeesNavigation : superAdminNavigation;
+    const activePage = navigation.find((item) => isNavigationItemActive(pathname, item.href));
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
     const [storageError, setStorageError] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [userName, setUserName] = useState("User");
+    const [displayRole, setDisplayRole] = useState("Account");
+    const signOutStarted = useRef(false);
 
     useEffect(() => {
-        const checkSession = () => {
+        const checkSession = async () => {
             try {
-                const hasSession =
-                    localStorage.getItem("ltraffic-demo-session") === "active" ||
-                    sessionStorage.getItem("ltraffic-demo-session") === "active";
+                const cachedName = localStorage.getItem("ltraffic-user-name") || sessionStorage.getItem("ltraffic-user-name");
+                const cachedRole = localStorage.getItem("ltraffic-user-role") || sessionStorage.getItem("ltraffic-user-role");
+                if (cachedName) setUserName(cachedName);
+                if (cachedRole) setDisplayRole(cachedRole.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
 
-                if (hasSession) {
-                    setIsAuthenticated(true);
-                } else {
+                const response = await fetch("/api/auth/me", { cache: "no-store" });
+                if (!response.ok) {
                     router.replace("/login");
+                    return;
                 }
+                const data = await response.json();
+                const profile = data?.data?.user ?? data?.data ?? {};
+                const roleValue = [
+                    profile.userType,
+                    profile.role,
+                    ...(Array.isArray(profile.roles) ? profile.roles : []),
+                ].filter(Boolean);
+                setRole(normalizeAdminRole(roleValue));
+                const resolvedName = String(profile.name || profile.fullName || profile.username || "User");
+                const resolvedRole = String(
+                    profile.userType ||
+                    profile.role ||
+                    (Array.isArray(profile.roles) ? profile.roles[0] : "") ||
+                    "Account"
+                );
+                setUserName(resolvedName);
+                setDisplayRole(resolvedRole.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()));
+                setIsAuthenticated(true);
             } catch {
                 setStorageError(true);
             } finally {
                 setIsChecking(false);
             }
         };
-        const timeoutId = window.setTimeout(checkSession, 0);
-
-        return () => window.clearTimeout(timeoutId);
+        void checkSession();
     }, [router]);
 
-    function handleSignOut() {
-        try {
-            localStorage.removeItem("ltraffic-demo-session");
-            sessionStorage.removeItem("ltraffic-demo-session");
-            router.replace("/login");
-        } catch {
-            setStorageError(true);
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        if (role === "employees" && pathname.startsWith("/admin/super-admin")) {
+            router.replace("/admin/employees");
         }
-    }
+        if (role === "super-admin" && pathname.startsWith("/admin/employees")) {
+            router.replace("/admin/super-admin");
+        }
+    }, [isAuthenticated, pathname, role, router]);
+
+    const handleSignOut = useCallback(async () => {
+        if (signOutStarted.current) return;
+        signOutStarted.current = true;
+        try {
+            await fetch("/api/auth/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        } catch {
+            // Session cookies are also cleared by the logout route where possible.
+        }
+        localStorage.removeItem("ltraffic-demo-session");
+        sessionStorage.removeItem("ltraffic-demo-session");
+        localStorage.removeItem("ltraffic-user-type");
+        sessionStorage.removeItem("ltraffic-user-type");
+        localStorage.removeItem("ltraffic-user-name");
+        sessionStorage.removeItem("ltraffic-user-name");
+        localStorage.removeItem("ltraffic-user-role");
+        sessionStorage.removeItem("ltraffic-user-role");
+        router.replace("/login");
+        router.refresh();
+    }, [router]);
+
+    useEffect(() => {
+        const handleUnauthorized = () => { void handleSignOut(); };
+        window.addEventListener("ltraffic:unauthorized", handleUnauthorized);
+        return () => window.removeEventListener("ltraffic:unauthorized", handleUnauthorized);
+    }, [handleSignOut]);
 
     if (isChecking) {
         return <main className="admin-loading" aria-live="polite">Loading admin panel…</main>;
@@ -86,13 +135,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <aside className={`admin-sidebar${isSidebarOpen ? " is-open" : ""}`}>
                 <Link className="admin-brand" href="/admin" onClick={() => setIsSidebarOpen(false)}>
                     <span className="admin-brand-mark"><FiBriefcase aria-hidden="true" /></span>
-                    <span><strong>LTraffic</strong><small>Operations workspace</small></span>
+                    <span><strong>LTraffic</strong><small>{displayRole}</small></span>
                 </Link>
 
                 <div className="admin-nav-label">Workspace modules</div>
                 <nav className="admin-navigation" aria-label="Admin navigation">
-                    {adminNavigation.map(({ label, href, icon: Icon }) => {
-                        const isActive = pathname.startsWith(href);
+                    {navigation.map(({ label, href, icon: Icon }) => {
+                        const isActive = isNavigationItemActive(pathname, href);
 
                         return (
                             <Link
@@ -111,8 +160,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </nav>
 
                 <div className="admin-sidebar-footer">
-                    <span className="admin-avatar">A</span>
-                    <span className="admin-user-copy"><strong>Administrator</strong><small>Demo account</small></span>
+                    <span className="admin-avatar">{userName.trim().charAt(0).toUpperCase()}</span>
+                    <span className="admin-user-copy"><strong>{userName}</strong><small>{displayRole}</small></span>
                     <button className="admin-signout-icon" type="button" onClick={handleSignOut} aria-label="Sign out">
                         <FiLogOut aria-hidden="true" />
                     </button>
@@ -135,28 +184,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                             <span>LTraffic</span><FiChevronRight aria-hidden="true" />
                             <strong>{activePage?.label ?? (isEmployeesArea ? "Employees Area" : "Admin Area")}</strong>
                         </div>
-                        <nav className="admin-area-switch" aria-label="Switch workspace">
-                            <Link
-                                className={`admin-area-option${!isEmployeesArea ? " is-current" : ""}`}
-                                href="/admin"
-                                aria-current={!isEmployeesArea ? "page" : undefined}
-                            >
-                                <FiGrid aria-hidden="true" /><span>Admin Area</span>
-                            </Link>
-                            <Link
-                                className={`admin-area-option${isEmployeesArea ? " is-current" : ""}`}
-                                href="/admin/employeesarea"
-                                aria-current={isEmployeesArea ? "page" : undefined}
-                            >
-                                <FiBriefcase aria-hidden="true" /><span>Employees Area</span>
-                            </Link>
-                        </nav>
                     </div>
                     <button className="admin-signout" type="button" onClick={handleSignOut}>
                         <FiLogOut aria-hidden="true" /><span>Sign out</span>
                     </button>
                 </header>
-                <main className="admin-content">{children}</main>
+                <AdminRoleContext.Provider value={role}>
+                    <main className="admin-content">{children}</main>
+                </AdminRoleContext.Provider>
             </div>
         </div>
     );

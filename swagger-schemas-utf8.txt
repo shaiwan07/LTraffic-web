@@ -1,0 +1,241 @@
+﻿
+SCHEMA LoginRequest
+{
+  "type": "object",
+  "required": [
+    "password"
+  ],
+  "description": "Provide ONE of `identifier`, `username`, or `email` ÔÇö any of the three\nworks. `password` is always required. `deviceId` is optional but strongly\nrecommended for per-device logout support. Mobile clients may also send\n`fcm_token` and `platform`; when both are present, the token is registered\nautomatically for the authenticated user.\n\n**Validation:** at least one of `identifier`, `username`, or `email`\nmust be non-empty after trimming, otherwise the server returns 422.\n\n| Field | Required | Notes |\n|-------|----------|-------|\n| identifier / username / email | ONE required | Merged server-side |\n| password | Yes | 1ÔÇô200 chars |\n| deviceId | No | Ties refresh token to device |\n| fcm_token | No | Auto-registers when `platform` is also supplied |\n| platform | No | `android` or `ios`; required with `fcm_token` |\n",
+  "example": {
+    "identifier": "admin",
+    "password": "Test@1234",
+    "deviceId": "a1b2c3-d4e5f6",
+    "fcm_token": "fMEP0vJqS0m:APA91bH...",
+    "platform": "android"
+  },
+  "properties": {
+    "identifier": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "**PREFERRED.** Username OR email ÔÇö backend auto-detects.",
+      "example": "admin"
+    },
+    "username": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Legacy alias for `identifier`. Accepted for PHP-parity.",
+      "example": "admin"
+    },
+    "email": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Legacy alias for `identifier`. Accepted for PHP-parity.",
+      "example": "al@ltraffic.co.uk"
+    },
+    "password": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "**REQUIRED.** Plain-text password. Server handles MD5/bcrypt comparison internally.",
+      "example": "Test@1234"
+    },
+    "deviceId": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "**OPTIONAL but recommended.** Stable per-device identifier from the\nmobile OS (Android: `Settings.Secure.ANDROID_ID`; iOS:\n`UIDevice.identifierForVendor`). Ties the issued refresh token to\nthis device so per-device logout is possible later.\n",
+      "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    },
+    "fcm_token": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 512,
+      "description": "**OPTIONAL.** FCM token to register after successful login.",
+      "example": "fMEP0vJqS0m:APA91bH..."
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "ios",
+        "android"
+      ],
+      "description": "**OPTIONAL.** Required together with `fcm_token`.",
+      "example": "android"
+    }
+  }
+}
+
+SCHEMA LoginResponse
+{
+  "type": "object",
+  "description": "Successful login. Contains a short-lived JWT access token, a long-lived\nopaque refresh token, and the authenticated user's profile with resolved\nroles and `userType` routing hint.\n",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "example": true
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "accessToken",
+        "accessExpiresIn",
+        "refreshToken",
+        "refreshExpiresAt",
+        "user"
+      ],
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "JWT (HS256) to send on every subsequent request as\n`Authorization: Bearer <accessToken>`. Expires in 15 minutes.\n",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3MjA1MjE1NDgsImV4cCI6MTcyMDUyMjQ0OCwiaXNzIjoibHRyYWZmaWMtYXBpIn0.abc123"
+        },
+        "accessExpiresIn": {
+          "type": "string",
+          "description": "Human-readable lifetime of `accessToken`.",
+          "example": "15m"
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "64-char opaque hex token. Store in **secure storage only**\n(iOS Keychain / Android EncryptedSharedPreferences). Use on\n`/auth/refresh` when the access token expires. Rotates on every use.\n",
+          "example": "3f2a1b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a"
+        },
+        "refreshExpiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Absolute UTC expiry of `refreshToken` (~60 days from login).",
+          "example": "2026-09-09T11:19:08.706Z"
+        },
+        "bulletinAcknowledgementRequired": {
+          "type": "boolean",
+          "description": "True when active bulletins remain unread; the employee app must open Bulletins before its main dashboard.",
+          "example": true
+        },
+        "pendingBulletinCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of active bulletins the user must acknowledge.",
+          "example": 2
+        },
+        "user": {
+          "$ref": "#/components/schemas/AuthenticatedUser"
+        }
+      }
+    }
+  }
+}
+
+SCHEMA AuthenticatedUser
+{
+  "type": "object",
+  "description": "Profile of the logged-in user with resolved roles. Returned inside\n`LoginResponse.data.user` and from `GET /auth/me`.\n\n**PHP compatibility:** field values are sourced from the shared\n`login_users` and `login_levels` tables ÔÇö identical to what PHP reads.\n",
+  "required": [
+    "id",
+    "username",
+    "name",
+    "email",
+    "levelIds",
+    "roles",
+    "userType"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Primary key from `login_users.user_id`.",
+      "example": 1
+    },
+    "username": {
+      "type": "string",
+      "description": "Login username from `login_users.username`.",
+      "example": "admin"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name from `login_users.name1`.",
+      "example": "Anthony Louch"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address from `login_users.email`.",
+      "example": "al@ltraffic.co.uk"
+    },
+    "ltrafficid": {
+      "type": "string",
+      "nullable": true,
+      "description": "Employee ID from `login_users.ltrafficid`. Null if not assigned.",
+      "example": "00001"
+    },
+    "team": {
+      "type": "string",
+      "nullable": true,
+      "description": "Team assignment from `login_users.team`.",
+      "example": "director"
+    },
+    "levelIds": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9
+      },
+      "description": "Numeric level IDs from `login_levels`. A user may hold multiple\nlevels (comma-separated in PHP `login_users.user_level`).\n\n| ID | Role | userType |\n|----|------|----------|\n| 1 | Admin | admin |\n| 2 | Driving Operatives | employee |\n| 3 | Operatives | employee |\n| 4 | Admin1 | admin |\n| 5 | Civils TFL Driver | employee |\n| 6 | Civils Trailer Driver | employee |\n| 7 | Admin2 | admin |\n| 8 | Essex Supervisor | admin |\n| 9 | Customer | employee |\n",
+      "example": [
+        1
+      ]
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Human-readable role names matching PHP `protect(\"Admin, Admin1\")`.\nUse these for client-side permission gating.\n",
+      "example": [
+        "Admin"
+      ]
+    },
+    "userType": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "employee"
+      ],
+      "description": "Routing hint: which mobile app this user belongs in.\n`admin` = levels 1, 4, 7, 8. `employee` = all others.\nUse this to decide which screens / navigation to show after login.\n",
+      "example": "admin"
+    }
+  }
+}
+
+SCHEMA LogoutRequest
+{
+  "type": "object",
+  "required": [
+    "refreshToken"
+  ],
+  "description": "Submit the refresh token to revoke it. The access token itself is NOT\nblacklisted ÔÇö it is short-lived (15m) and will expire naturally.\nClients should discard both tokens after calling this endpoint.\n",
+  "properties": {
+    "refreshToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "**REQUIRED.** The refresh token to revoke.",
+      "example": "3f2a1b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a"
+    }
+  }
+}
+
+SCHEMA RefreshRequest
+{
+  "type": "object",
+  "required": [
+    "refreshToken"
+  ],
+  "description": "Submit the current refresh token to obtain a new access + refresh token pair.",
+  "properties": {
+    "refreshToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "**REQUIRED.** The refresh token previously issued by `/auth/login` or `/auth/refresh`.",
+      "example": "3f2a1b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a"
+    }
+  }
+}
